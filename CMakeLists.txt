@@ -3,6 +3,7 @@ project(hexsmoothing)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include_directories(ext/stlbfgs)
 
 find_package(OpenMP)
 if(OPENMP_FOUND)
@@ -21,7 +22,8 @@ add_library(libBasicUtilies ${SOURCES})
 file(GLOB SOURCES lib/*.cpp lib/*.h )
 add_library(libhexsmoothing ${SOURCES})
 target_link_libraries(libhexsmoothing libBasicUtilies)
-target_include_directories(libhexsmoothing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(libhexsmoothing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ext/)
+target_include_directories(libhexsmoothing PUBLIC ext/)
 
 if(OpenMP_CXX_FOUND)
     target_link_libraries(libhexsmoothing OpenMP::OpenMP_CXX)

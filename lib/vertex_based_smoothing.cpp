@@ -1,4 +1,4 @@
-#include "vertexBasedSmoothing.h"
+#include "vertex_based_smoothing.h"
 
 #include <utils/projection.h>
 

@@ -4,17 +4,24 @@
 #include <array>
 #include "vec.h"
 
+// numbering convention is the same as https://github.com/ssloy/ultimaille
 namespace utilities {
-
 
     struct CurveMesh {
         std::vector<vec3> _pts;
         std::vector<std::array<int, 2>> _edges;
     };
 
+    // the 3 points form a 2D direct base with tri[0] the orign
     struct TriangleMesh {
         std::vector<vec3> _pts;
         std::vector<std::array<int, 3>> _tris;
+    };
+
+    // the 4 points form a direct base with tet[0] the origin
+    struct TetrahedralMesh {
+        std::vector<vec3> _pts;
+        std::vector<std::array<int, 4>> _tets;
     };
 
        /* 
