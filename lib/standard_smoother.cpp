@@ -87,7 +87,6 @@ static const vec3 hex_ref[8] = {
 };
 
 bool smooth_hex_mesh(HexahedralMesh& m, const std::vector<bool>& locks, unsigned max_iter, bool only_SJ_tets) {
-	std::cerr << "Running hex smoother...";
 	assert(m._pts.size() * 3 == locks.size());
 	smoother_options options = _3D_default;
 	options.static_threshold = 1e-7;
@@ -96,7 +95,7 @@ bool smooth_hex_mesh(HexahedralMesh& m, const std::vector<bool>& locks, unsigned
 	options.bfgs_maxiter = 100;
 	options.eps_from_theorem = false;
 	options.maxiter = max_iter;
-	options.debug = false;
+	options.debug = true;
 
 	std::vector<double> verts(m._pts.size() * 3);
 	FOR(v, m._pts.size()) FOR(d, 3) verts[3 * v + d] = m._pts[v][d];

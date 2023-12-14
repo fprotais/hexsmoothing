@@ -403,7 +403,7 @@ bool Elliptic_smoother_3D::run_newton(std::vector<double>& X) {
 bool Elliptic_smoother_3D::go() {
     if (options_.debug > 0) {
         std::cerr << "==== Running Elliptic smoother 3d. ====" << "\n";
-        display_options(options_);
+        // display_options(options_);
     }
     if (var_.nb_of_reducted_variables() == 0) {
         std::cerr << "No variables to optimize" << "\n";
