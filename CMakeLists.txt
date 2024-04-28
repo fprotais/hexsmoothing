@@ -34,6 +34,10 @@ add_executable(innerSmoother bin/innerSmoothing.cpp)
 target_link_libraries(innerSmoother libhexsmoothing ultimaille)
 target_include_directories(innerSmoother PUBLIC ext/ultimaille)
 
+add_executable(mixedSmoothing bin/mixedSmoothing.cpp)
+target_link_libraries(mixedSmoothing libhexsmoothing ultimaille)
+target_include_directories(mixedSmoothing PUBLIC ext/ultimaille)
+
 if(OpenMP_CXX_FOUND)
     target_link_libraries(libhexsmoothing OpenMP::OpenMP_CXX)
 endif()

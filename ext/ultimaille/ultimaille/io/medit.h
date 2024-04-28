@@ -25,6 +25,8 @@
  */
 
 namespace UM {
+    void write_medit_format(const std::string& filename, const std::vector<vec3>& verts_, const std::vector<int>& edges_, const std::vector<int>& tris_, const std::vector<int>& quads_, const std::vector<int>& tets_, const  std::vector<int>& hexes_, const std::vector<int>& wedges_, const  std::vector<int>& pyramids_);
+
     void write_medit(const std::string filename, const PolyLine &pl);
     void write_medit(const std::string filename, const Surface &m);
     void write_medit(const std::string filename, const Volume  &m);
