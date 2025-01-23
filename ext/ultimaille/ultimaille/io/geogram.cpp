@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <cstdint>
+#include <algorithm>
 
 #include "ultimaille/io/geogram.h"
 #include <zlib/zlib.h>

@@ -1,6 +1,7 @@
 #include "elliptic_smoothing.h"
 
 #include <ext/stlbfgs/stlbfgs.h>
+#include <algorithm>
 
 #include <cmath>
 #include <iostream>
