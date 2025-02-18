@@ -388,7 +388,6 @@ bool Elliptic_smoother_3D::run_lbfgs(std::vector<double>& X) {
         energy(X, F, G);
     };
     STLBFGS::Optimizer opt = { func };
-
     opt.gtol = options_.bfgs_threshold;
     opt.ftol = options_.bfgs_threshold;
     opt.maxiter = options_.bfgs_maxiter;
@@ -431,7 +430,7 @@ bool Elliptic_smoother_3D::go() {
     FOR(iter, options_.maxiter) {
         if (options_.debug > 0) std::cerr << "iteration #" << iter << "\n";
         if (!options_.eps_from_theorem) {
-            if (iter && iter % 10 == 0 && e0 > 1e-10) e0 /= 2.;
+            if (iter && iter % 10 == 0 && e0 > 1e-14) e0 /= 2.;
             eps_ = detmin_ > 0 ? e0 : std::sqrt(e0 * e0 + 0.04 * detmin_ * detmin_);
         }
         if (options_.debug > 0) std::cerr << "E: " << evaluate_energy() << " eps: " << eps_ << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
@@ -451,7 +450,7 @@ bool Elliptic_smoother_3D::go() {
             double mu = (1 - sigma) * chi(eps_, detmin_);
             if (detmin_ < mu)
                 eps_ = 2 * std::sqrt(mu * (mu - detmin_));
-            else eps_ = 1e-10;
+            else eps_ = 1e-14;
         }
         iter_call_back(iter);
         if (detmin_ > 0 && std::abs(E_prev - E) / E < options_.static_threshold) break;

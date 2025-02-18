@@ -240,10 +240,17 @@ public:
 	{
 		nb_unlocked_ = 0;
 		verts_.resize(verts.size());
-		locked_.resize(verts.size());
+		locked_.resize(verts.size(), true);
+		for (int t = 0; t < (int) tets.size(); t++) {
+			for (int tv = 0; tv < 4; tv++) {
+				for (unsigned d = 0; d < 3; ++d) {
+					locked_[3*tets[t][tv]+d] = false; // locking lone vertices					
+				}
+			}
+		}
 
 		for (int i = 0; i < (int) verts.size(); i++) verts_[i] = verts[i];
-		for (int i = 0; i < (int) verts.size(); i++) locked_[i] = locks[i];
+		for (int i = 0; i < (int) verts.size(); i++) if (locks[i]) locked_[i] = true;
 
 		map_to_vert_.resize(12 * tets.size());
 		reduc_.resize(verts_.size());

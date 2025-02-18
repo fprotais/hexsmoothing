@@ -103,6 +103,7 @@ namespace UM {
         }
         constexpr int pixel2quad[4] = { 0,1,3,2 };
         constexpr int vtk2geo[8] = { 0,1,3,2,4,5,7,6 };
+        constexpr int wedgeTranslator[6] = { 0,2,1,3,5,4 };
 
         FOR(i, nb_cells) {
             file_must_no_be_at_end(in, "parsing VTK");
@@ -131,7 +132,7 @@ namespace UM {
                 FOR(j, 8) hexes_.push_back(cell_content[start_of_cell[i] + vtk2geo[j]]);
                 break;
             case 13:
-                FOR(j, 6) wedges_.push_back(cell_content[start_of_cell[i] + j]);
+                FOR(j, 6) wedges_.push_back(cell_content[start_of_cell[i] + wedgeTranslator[j]]);
                 break;
             case 14:
                 FOR(j, 5) pyramids_.push_back(cell_content[start_of_cell[i] + j]);

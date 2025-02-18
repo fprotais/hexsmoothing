@@ -4,11 +4,11 @@
 #include <map>
 #include <set>
 
-#define INVERSE_ORIENTATION 1
+#define INVERSE_ORIENTATION 0
 #define SMOOTH_TETS 1
 #define SMOOTH_HEXES 1
 #define SMOOTH_PYRAMIDS 1
-#define SMOOTH_WEDGEs 1
+#define SMOOTH_WEDGES 1
 
 #define FOR(i, n) for(int i = 0; i < n; i++)
 
@@ -150,7 +150,7 @@ bool smoothMixedMesh(
 #endif 
 
 
-#if SMOOTH_WEDGEs
+#if SMOOTH_WEDGES
     { // wedge
         std::cout << "copying wedges. (" <<  wedges.size() / 6 << ")" << std::endl;
         constexpr int WEDGE_CORNER_SPLITTING[6][4] = {
@@ -204,8 +204,39 @@ bool smoothMixedMesh(
         }
     }
 
+    //// debug quadratures
+    // FOR(i, proxy_mesh._tets.size()) {
+    //     std::cout << "===================================" << std::endl;
+    //     std::cout << "REF:" << std::endl;
+    //     FOR(j, 4) {
+    //         std::cout << refs[i][j] << std::endl;
+    //     }
+    //     std::cout << cross(refs[i][1] - refs[i][0], refs[i][2] - refs[i][0]) * (refs[i][3] - refs[i][0]) << std::endl; 
+    //     std::cout << "TET:" << std::endl;
+    //     FOR(j, 4) {
+    //         std::cout << proxy_mesh._tets[i][j] << ",";
+    //     }
+    //     std::cout << std::endl;
+    //     std::cout << "coords:" << std::endl;
+    //     FOR(j, 4) {
+    //         std::cout << proxy_mesh._pts[proxy_mesh._tets[i][j]] << std::endl;
+    //     }
+    //     utilities::vec3 v0 = proxy_mesh._pts[proxy_mesh._tets[i][1]] - proxy_mesh._pts[proxy_mesh._tets[i][0]];
+    //     utilities::vec3 v1 = proxy_mesh._pts[proxy_mesh._tets[i][2]] - proxy_mesh._pts[proxy_mesh._tets[i][0]];
+    //     utilities::vec3 v2 = proxy_mesh._pts[proxy_mesh._tets[i][3]] - proxy_mesh._pts[proxy_mesh._tets[i][0]];
+    //     std::cout << cross(v0, v1) * v2 << std::endl; 
+    // }
 
-
+    // scaling refs to avoid epsilon issues
+    double avgEdgeSize = 0;
+    FOR(i, proxy_mesh._tets.size()) FOR(j, 4) {
+            utilities::vec3 dir = proxy_mesh._pts[proxy_mesh._tets[i][j]] - proxy_mesh._pts[proxy_mesh._tets[i][0]];
+            avgEdgeSize += dir.norm();
+    }
+    avgEdgeSize /= proxy_mesh._tets.size();
+    FOR(i, proxy_mesh._tets.size()) FOR(j, 4) {
+        refs[i][j] *= avgEdgeSize;
+    }
     // FOR(v, mixedVerts.size()) {
     //     if (locks[3*v]) continue;
     //     FOR(d, 3) {
@@ -224,8 +255,8 @@ bool smoothMixedMesh(
 	smoother_options options = _3D_default;
 	options.static_threshold = 1e-7;
 	options.bfgs_threshold = 1e-14;
-	options.theta =0.;
-	options.bfgs_maxiter = 500;
+	options.theta = 0.;
+	options.bfgs_maxiter = 50;
 	options.eps_from_theorem = true;
 	options.maxiter = maxIter;
 	options.debug = true;
