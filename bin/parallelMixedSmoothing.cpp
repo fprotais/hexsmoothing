@@ -1,6 +1,14 @@
-#include "ultimaille/all.h"
+#include <ultimaille/all.h>
 #include <lib/mesh_converter.h>
-#include "lib/elliptic_smoothing.h"
+#include <lib/elliptic_smoothing.h>
+
+#include <parallel_lib/parallel_tet_smoother.h>
+
+#include <Eigen/Eigen>
+#include <omp.h>
+
+#include <utils/logTime.h>
+
 
 #define FOR(i, n) for(int i = 0; i < n; i++)
 
@@ -37,23 +45,21 @@ int main(int argc, char** argv) {
     std::vector<int> wedges; 
     std::vector<int> pyramids;
 
+    std::cout << "PARALLEL MIXED MESH SMOOTHING" << std::endl;
+    std::cout << "Nb of available threads: " << omp_get_max_threads() << std::endl;
+    std::cout << "Nb threads used by Eigen: " << Eigen::nbThreads() << std::endl;
 
+    TimeLog logging("Parallel smoothing");
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
-    std::cout << "MIXED MESH SMOOTHING" << std::endl;
-    // UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
-
+    UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    
+    logging.logSubStep("Reading mesh");
 	utilities::TetrahedralMesh proxy_mesh;
 	std::vector<std::array<utilities::vec3, 4>> refs;
     std::vector<bool> bndVert;
 
     convertedToTetMesh(verts, tets, hexes, wedges, pyramids, proxy_mesh, bndVert, refs);
-
-    std::vector<double> serializedVerts(verts.size() * 3);
-    std::vector<bool> vertLocks(verts.size() * 3);
-
-	FOR(v, verts.size()) FOR(d, 3) serializedVerts[3 * v + d] = verts[v][d];
-	FOR(v, verts.size()) FOR(d, 3) vertLocks[3 * v + d] = bndVert[v];
 
     double avgEdgeSize = 0;
     FOR(i, proxy_mesh._tets.size()) FOR(j, 3) {
@@ -64,33 +70,23 @@ int main(int argc, char** argv) {
     FOR(i, proxy_mesh._tets.size()) FOR(j, 4) {
         refs[i][j] *= avgEdgeSize;
     }
+    logging.logSubStep("Convert to tet elements");
 
-	Tets_id_with_lock var(serializedVerts, proxy_mesh._tets, vertLocks);
+    Parallel_tet_smoother smoother(proxy_mesh);
+    smoother.setRefs(refs);
+    smoother.setVertsLocks(bndVert);
+    smoother.max_untangling_iter = nbIter;
+    smoother.fineTimeLogging = (proxy_mesh._tets.size() > 100000); // enable to see the progress on large meshes
+    bool res = smoother.go();
 
-
-	smoother_options options = _3D_default;
-	options.static_threshold = 1e-7;
-	options.bfgs_threshold = 1e-14;
-	options.theta = 0.;
-	options.bfgs_maxiter = 50;
-	options.eps_from_theorem = true;
-	options.maxiter = nbIter;
-	options.debug = true;
-    std::cout << "Smoothing..." << std::endl;
-    std::cout << "Proxy tet mesh: " << proxy_mesh._tets.size() << " elements" << std::endl;
-    std::cout << "                " << proxy_mesh._pts.size() << " vertices"<< std::endl;
-
-
-	Elliptic_smoother_3D opt(var, proxy_mesh._tets.size(), options);
-	FOR(i, refs.size()) opt.set_tet_ref(i, refs[i]);
+    FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[i][d];
+    logging.logSubStep("Smoothing");
     
-	bool res = opt.go();
-	var.get_verts(serializedVerts);
-	FOR(v, verts.size()) FOR(d, 3) verts[v][d] = serializedVerts[3 * v + d];
-
 
     std::cout << "Done: " << (res ? "success" : "failed untangling") << std::endl;
     UM::write_mixedMesh_byExtension(outputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    logging.logSubStep("Saving mesh");
+    logging.logTotalTime();
 
     // UM::write_medit_format("output.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 

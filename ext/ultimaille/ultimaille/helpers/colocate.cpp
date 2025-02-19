@@ -9,7 +9,6 @@ namespace UM {
 
         KNN<3> knn(points);
 
-#pragma omp parallel for
         for (int seed=0; seed<nb; seed++) {
             int k = std::min<int>(6, nb);
             while (1) {

@@ -54,6 +54,54 @@ namespace UM {
         }
         return {};
     }
+
+
+    inline void write_mixedMesh_byExtension(
+        const std::string& filename, 
+        const std::vector<vec3>& verts, 
+        const std::vector<int>& edges, 
+        const std::vector<int>& tris, 
+        const std::vector<int>& quads, 
+        const std::vector<int>& tets, 
+        const std::vector<int>& hexes, 
+        const std::vector<int>& wedges, 
+        const  std::vector<int>& pyramids
+    ) {
+        std::string ext = std::filesystem::path(filename).extension().string();
+        if (ext == ".vtk") {
+            UM::write_vtk_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+        }
+        else if (ext == ".mesh") {
+            UM::write_medit_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+        }
+        else {
+            throw std::runtime_error("Error: unsupported extension for writing mixed mesh: '" + ext+ "'. Use only '.mesh' (medit) or '.vtk'");
+        }
+    }
+
+    inline void read_mixedMesh_byExtension(
+        const std::string& filename, 
+        std::vector<vec3>& verts, 
+        std::vector<int>& edges, 
+        std::vector<int>& tris, 
+        std::vector<int>& quads, 
+        std::vector<int>& tets, 
+        std::vector<int>& hexes, 
+        std::vector<int>& wedges, 
+        std::vector<int>& pyramids
+    ) {
+        std::string ext = std::filesystem::path(filename).extension().string();
+        std::vector<int> color;
+        if (ext == ".vtk") {
+            UM::read_vtk_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+        }
+        else if (ext == ".mesh") {
+            UM::read_medit_format(filename, color, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+        }
+        else {
+            throw std::runtime_error("Error: unsupported extension for reading mixed mesh: '" + ext+ "'. Use only '.mesh' (medit) or '.vtk'");
+        }
+    }
 }
 
 #endif // __BY_EXTENSION_H__

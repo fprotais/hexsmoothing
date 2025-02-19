@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cassert>
+#include <numeric>
 
 namespace UM {
     struct Permutation {
