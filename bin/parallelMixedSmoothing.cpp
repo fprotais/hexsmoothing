@@ -16,13 +16,13 @@ using namespace UM;
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " mixedMesh.ext smoothed_hexmesh.ext nbiter" << std::endl;
-        std::cerr << "- (input) hexmesh.ext must contain a mesh. It can include Tetrahedra, Hexahedra, Wedges and Pyramids." << std::endl;
-        std::cerr << "- (output) smoothed_hexmesh.ext, result smoothed mesh'" << std::endl;
-        std::cerr << "- (input - optional) nbiter: number of smoothing iter. Default is 20." << std::endl;
-        std::cerr << std::endl;
-        std::cerr << "ext formats can be '.mesh' -medit- or '.vtk'." << std::endl;
-        std::cerr << "contact: francoisprotais@gmail.com" << std::endl;
+        std::cout << "Usage: " << argv[0] << " mixedMesh.ext smoothed_hexmesh.ext nbiter" << std::endl;
+        std::cout << "- (input) hexmesh.ext must contain a mesh. It can include Tetrahedra, Hexahedra, Wedges and Pyramids." << std::endl;
+        std::cout << "- (output) smoothed_hexmesh.ext, result smoothed mesh'" << std::endl;
+        std::cout << "- (input - optional) nbiter: number of smoothing iter. Default is 20." << std::endl;
+        std::cout << std::endl;
+        std::cout << "ext formats can be '.mesh' -medit- or '.vtk'." << std::endl;
+        std::cout << "contact: francoisprotais@gmail.com" << std::endl;
         return 1;
     }
     std::string inputMesh(argv[1]);
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     TimeLog logging("Parallel smoothing");
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
-    UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    // UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
     
     logging.logSubStep("Reading mesh");
 	utilities::TetrahedralMesh proxy_mesh;

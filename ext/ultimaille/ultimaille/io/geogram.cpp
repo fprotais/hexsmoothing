@@ -125,7 +125,7 @@ namespace UM {
                 }
             }
         } catch (const std::exception& e) {
-            std::cerr << "Ooops: catch error= " << e.what() << " when creating " << filename << "\n";
+            std::cout << "Ooops: catch error= " << e.what() << " when creating " << filename << "\n";
         }
     }
 
@@ -194,7 +194,7 @@ namespace UM {
                 }
             }
         } catch (const std::exception& e) {
-            std::cerr << "Ooops: catch error= " << e.what() << " when creating " << filename << "\n";
+            std::cout << "Ooops: catch error= " << e.what() << " when creating " << filename << "\n";
         }
     }
 
@@ -206,7 +206,7 @@ namespace UM {
         int fct_per_cell = geogram_nb_facets_per_cell_type[m.cell_type()];
         int bruno_fct_per_cell = fct_per_cell + geogram_nb_padding_per_cell_type[m.cell_type()];
         int bruno_nfacets = m.ncells() * bruno_fct_per_cell;
-//      std::cerr << "PADDING; bruno_nfacets: " << bruno_nfacets << " nfacets: " << m.nfacets() << std::endl;
+//      std::cout << "PADDING; bruno_nfacets: " << bruno_nfacets << " nfacets: " << m.nfacets() << std::endl;
         tmp.resize(bruno_nfacets);
         for (int c=m.ncells(); c--;)
             for (int f=fct_per_cell; f--;)
@@ -291,7 +291,7 @@ namespace UM {
                 }
             }
         } catch (const std::exception& e) {
-            std::cerr << "Ooops: catch error= " << e.what() << " when creating " << filename << "\n";
+            std::cout << "Ooops: catch error= " << e.what() << " when creating " << filename << "\n";
         }
     }
 
@@ -312,18 +312,18 @@ namespace UM {
             current_chunk_size_(0),
             current_chunk_file_pos_(0) {
 
-                //        std::cerr << "GeogramGZReader()\n";
+                //        std::cout << "GeogramGZReader()\n";
                 file_ = gzopen(filename.c_str(), "rb");
                 if (!file_)
                     throw std::runtime_error("Can not open file");
 
-                //        std::cerr << "read_chunk_header()\n";
+                //        std::cout << "read_chunk_header()\n";
                 read_chunk_header();
                 if (current_chunk_class_ != "HEAD") {
                     throw std::runtime_error(filename + " Does not start with HEAD chunk");
                 }
 
-                //        std::cerr << "read_string()\n";
+                //        std::cout << "read_string()\n";
                 std::string magic = read_string();
                 if(magic != "GEOGRAM") {
                     throw std::runtime_error(filename + " is not a GEOGRAM file");
@@ -443,7 +443,7 @@ namespace UM {
                     std::string attribute_set_name = in.read_string();
                     index_t nb_items = in.read_int();
                     in.check_chunk_size();
-//                  std::cerr << "ATTS " << attribute_set_name << " " << nb_items << std::endl;
+//                  std::cout << "ATTS " << attribute_set_name << " " << nb_items << std::endl;
                     for (int i=0; i<7; i++)
                         if (attribute_set_name == attrib_set_names[i])
                             set_size[i] = nb_items;
@@ -464,7 +464,7 @@ namespace UM {
 
                     if (attribute_name=="GEO::Mesh::cell_facets::adjacent_cell" || attribute_name=="GEO::Mesh::facet_corners::corner_adjacent_facet") continue;
 
-//                  std::cerr << "ATTR " << attribute_set_name << " " << attribute_name << " " << element_type << " " << element_size << " " << dimension << "\n";
+//                  std::cout << "ATTR " << attribute_set_name << " " << attribute_name << " " << element_type << " " << element_size << " " << dimension << "\n";
 
                     std::shared_ptr<GenericAttributeContainer> P;
                     if (element_type=="char") {
@@ -512,7 +512,7 @@ namespace UM {
                 } // chunk_class = ATTR
             } // chunks
         } catch (const std::exception& e) {
-            std::cerr << "Ooops: catch error= " << e.what() << " when reading " << filename << "\n";
+            std::cout << "Ooops: catch error= " << e.what() << " when reading " << filename << "\n";
         }
     }
 

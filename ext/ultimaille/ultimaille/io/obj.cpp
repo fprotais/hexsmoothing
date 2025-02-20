@@ -21,7 +21,7 @@ namespace UM {
         std::ifstream in;
         in.open (filename, std::ifstream::in);
         if (in.fail()) {
-            std::cerr << "Failed to open " << filename << std::endl;
+            std::cout << "Failed to open " << filename << std::endl;
             return {};
         }
         std::string line;
@@ -110,7 +110,7 @@ namespace UM {
         }
 
         in.close();
-//      std::cerr << "#v: " << m.nverts() << " #f: "  << m.nfacets() << std::endl;
+//      std::cout << "#v: " << m.nverts() << " #f: "  << m.nfacets() << std::endl;
         return sa;
     }
 

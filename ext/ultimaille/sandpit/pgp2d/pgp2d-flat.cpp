@@ -136,7 +136,7 @@ void compute_cross_field(const Triangles &m, const SurfaceConnectivity &fec, Fac
 
 int main(int argc, char** argv) {
     if (2>argc) {
-        std::cerr << "Usage: " << argv[0] << " model.obj" << std::endl;
+        std::cout << "Usage: " << argv[0] << " model.obj" << std::endl;
         return 1;
     }
     nlInitialize(argc, argv);
@@ -149,13 +149,13 @@ int main(int argc, char** argv) {
     FacetAttribute<double> theta(m);
     FacetAttribute<mat<2,2>> Bi(m);
 
-    std::cerr << "Computing fec...";
+    std::cout << "Computing fec...";
     SurfaceConnectivity fec(m);
-    std::cerr << "ok\n";
+    std::cout << "ok\n";
 
-    std::cerr << "Computing cross field...";
+    std::cout << "Computing cross field...";
     compute_cross_field(m, fec, theta, Bi, Rij);
-    std::cerr << "ok\n";
+    std::cout << "ok\n";
 
     SignedPairwiseEquality param_vars(m.ncorners()*2);
     SignedPairwiseEquality curlc_vars(m.ncorners()*2);

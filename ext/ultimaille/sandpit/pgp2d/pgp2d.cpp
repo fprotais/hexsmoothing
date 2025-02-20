@@ -52,7 +52,7 @@ double triangle_area(const vec2 A, const vec2 B, const vec2 C) {
 
 int main(int argc, char** argv) {
     if (2>argc) {
-        std::cerr << "Usage: " << argv[0] << " model.obj" << std::endl;
+        std::cout << "Usage: " << argv[0] << " model.obj" << std::endl;
         return 1;
     }
     nlInitialize(argc, argv);

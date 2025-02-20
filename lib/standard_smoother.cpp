@@ -147,6 +147,6 @@ bool smooth_hex_mesh(HexahedralMesh& m, const std::vector<bool>& locks, unsigned
 	bool res = opt.go();
 	var.get_verts(verts);
 	FOR(v, m._pts.size()) FOR(d, 3) m._pts[v][d] = verts[3 * v + d];
-	std::cerr << "Done\n";
+	std::cout << "Done\n";
 	return res;
 }

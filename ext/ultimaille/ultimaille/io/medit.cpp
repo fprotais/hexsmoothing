@@ -33,7 +33,7 @@ namespace UM {
         std::ifstream in;
         in.open(filename, std::ifstream::in);
         if (in.fail()) {
-            std::cerr << "Failed to open " << filename << std::endl;
+            std::cout << "Failed to open " << filename << std::endl;
             return;
         }
 
@@ -214,7 +214,7 @@ namespace UM {
         std::ofstream out_f;
         out_f.open(filename, std::ifstream::out);
         if (out_f.fail()) {
-            std::cerr << "Failed to open " << filename << std::endl;
+            std::cout << "Failed to open " << filename << std::endl;
             exit(1);
         }
         std::stringstream out;
@@ -322,7 +322,7 @@ namespace UM {
                 FOR(i, 4) quads.push_back(m.vert(f, i));
             }
             else {
-                std::cerr << "Polygon are not supported in our MEDIT writer";
+                std::cout << "Polygon are not supported in our MEDIT writer";
             }
         }
         write_medit_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
@@ -345,7 +345,7 @@ namespace UM {
             pyramids.resize(5 * m.ncells());
             FOR(h, m.ncells()) FOR(hv, 5) pyramids[5 * h + hv] = m.vert(h, hv);
         } else {
-            std::cerr << "Volume type : " << m.cell_type() << "; not supported in our MEDIT writer";
+            std::cout << "Volume type : " << m.cell_type() << "; not supported in our MEDIT writer";
         }
         write_medit_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
     }

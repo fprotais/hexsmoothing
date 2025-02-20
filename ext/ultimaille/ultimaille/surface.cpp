@@ -90,10 +90,10 @@ namespace UM {
                 corners_old2new[corner(f, lv)] = new_nb_corners++;
             facets_old2new[f] = new_nb_facets++;
         }
-//      std::cerr << "compressing facet attributes\n";
+//      std::cout << "compressing facet attributes\n";
         for (auto &wp : attr_facets)  if (auto spt = wp.lock())
             spt->compress(facets_old2new);
-//      std::cerr << "compressing corner attributes\n";
+//      std::cout << "compressing corner attributes\n";
         for (auto &wp : attr_corners) if (auto spt = wp.lock())
             spt->compress(corners_old2new);
     }

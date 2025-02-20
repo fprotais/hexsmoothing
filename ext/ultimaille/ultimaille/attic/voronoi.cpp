@@ -117,13 +117,13 @@ namespace UM {
             }
             if (cc_.status!=ConvexCell::security_radius_not_reached) {
                 cc = cc_;
-                std::cerr << "Clipping error: " << cc_.status << std::endl;
+                std::cout << "Clipping error: " << cc_.status << std::endl;
                 return false;
             }
             k_ = std::min(k_*2, npts);
-            //      std::cerr << "K: " << k_ << std::endl;
+            //      std::cout << "K: " << k_ << std::endl;
         }
-        std::cerr << "Clipping error, normally this part of code should not be reachable" << std::endl;
+        std::cout << "Clipping error, normally this part of code should not be reachable" << std::endl;
         return false;
     }
 
@@ -133,7 +133,7 @@ namespace UM {
        get_bbox(seeds, min, max);
        voronoi = Mesh();
 
-       std::cerr << "Computing the Voronoi diagram...";
+       std::cout << "Computing the Voronoi diagram...";
        std::vector<std::vector<vec2> > vorverts(seeds.size());
 
        KNN knn(seeds);
@@ -153,7 +153,7 @@ voronoi.vert(off_f, j) = off_v+j;
 }
 }
 glue_verts(voronoi, colocate_tolerance);
-std::cerr << "ok" << std::endl;
+std::cout << "ok" << std::endl;
 }
 
      */

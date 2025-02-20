@@ -218,7 +218,7 @@ bool Parallel_tet_smoother::go() {
             return elliptic_energy(x, &g);
         });
         opt._callBack = [&](VectorXd const &x, VectorXd const &g,double f,unsigned iternb,unsigned nbEval) {
-            if (fineTimeLogging)  fineLogging.logSubStep("LBFGS iter " + std::to_string(iternb));
+            if (fineTimeLogging)  fineLogging.logSubStep("LBFGS iter " + std::to_string(iternb), "Energy: " + std::to_string(f));
             else if (verbose) std::cout << "." << std::flush;
             return false;
         };

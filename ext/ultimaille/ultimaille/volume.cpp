@@ -119,13 +119,13 @@ namespace UM {
             cells_old2new[c] = new_nb_cells++;
         }
 
-//      std::cerr << "compressing cell attributes\n";
+//      std::cout << "compressing cell attributes\n";
         for (auto &wp : attr_cells)   if (auto spt = wp.lock())
             spt->compress(cells_old2new);
-//      std::cerr << "compressing facet attributes\n";
+//      std::cout << "compressing facet attributes\n";
         for (auto &wp : attr_facets)  if (auto spt = wp.lock())
             spt->compress(facets_old2new);
-//      std::cerr << "compressing corner attributes\n";
+//      std::cout << "compressing corner attributes\n";
         for (auto &wp : attr_corners) if (auto spt = wp.lock())
             spt->compress(corners_old2new);
     }

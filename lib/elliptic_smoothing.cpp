@@ -32,15 +32,15 @@ inline double chi_deriv(double eps, double det) {
 }
 
 inline void display_options(const smoother_options& opt) {
-    std::cerr << "Options: " << std::endl;
-    std::cerr << "-theta = " << opt.theta << std::endl;
-    std::cerr << "-maxiter = " << opt.maxiter << std::endl;
-    std::cerr << "-bfgs_threshold = " << opt.bfgs_threshold << std::endl;
-    std::cerr << "-bfgs_maxiter = " << opt.bfgs_maxiter << std::endl;
-    std::cerr << "-debug = " << opt.debug << std::endl;
-    std::cerr << "-eps_from_theorem = " << opt.eps_from_theorem << std::endl;
-    std::cerr << "-stopping_when_static = " << opt.stopping_when_static << std::endl;
-    std::cerr << "-static_threshold = " << opt.static_threshold << std::endl;
+    std::cout << "Options: " << std::endl;
+    std::cout << "-theta = " << opt.theta << std::endl;
+    std::cout << "-maxiter = " << opt.maxiter << std::endl;
+    std::cout << "-bfgs_threshold = " << opt.bfgs_threshold << std::endl;
+    std::cout << "-bfgs_maxiter = " << opt.bfgs_maxiter << std::endl;
+    std::cout << "-debug = " << opt.debug << std::endl;
+    std::cout << "-eps_from_theorem = " << opt.eps_from_theorem << std::endl;
+    std::cout << "-stopping_when_static = " << opt.stopping_when_static << std::endl;
+    std::cout << "-static_threshold = " << opt.static_threshold << std::endl;
 }
 
 
@@ -83,7 +83,7 @@ void Elliptic_smoother_2D::init() {
 }
 
 void Elliptic_smoother_2D::evaluate_jacobian() {
-    if (options_.debug > 3) std::cerr << "evaluate the jacobian...";
+    if (options_.debug > 3) std::cout << "evaluate the jacobian...";
     detmin_ = std::numeric_limits<double>::max();
     ninverted_ = 0;
 #if defined(_OPENMP) && _OPENMP>=200805
@@ -102,7 +102,7 @@ void Elliptic_smoother_2D::evaluate_jacobian() {
 
         K_[t] = { { J_[t][3], -J_[t][2], -J_[t][1], J_[t][0] } };// dual basis
     }
-    if (options_.debug > 3) std::cerr << "ok" << std::endl;
+    if (options_.debug > 3) std::cout << "ok" << std::endl;
 }
 
 double Elliptic_smoother_2D::evaluate_energy() {
@@ -177,7 +177,7 @@ bool Elliptic_smoother_2D::run_lbfgs(std::vector<double>& X) {
     // opt.verbose = options_.debug > 0;
 
     opt.run(X);
-    if (options_.debug > 0) std::cerr << " F : " << F0 << "  --->  " << F1 << "    ||   ";
+    if (options_.debug > 0) std::cout << " F : " << F0 << "  --->  " << F1 << "    ||   ";
     return true;// (F0 - F1) / F1 > 2.e-7;
 }
 
@@ -187,11 +187,11 @@ bool Elliptic_smoother_2D::run_newton(std::vector<double>& X) {
 
 bool Elliptic_smoother_2D::go() {
     if (options_.debug > 0) {
-        std::cerr << "==== Running Elliptic smoother 2d. ====" << std::endl;
+        std::cout << "==== Running Elliptic smoother 2d. ====" << std::endl;
         display_options(options_);
     }
     if (var_.nb_of_reducted_variables() == 0) {
-        std::cerr << "No variables to optimize" << std::endl;
+        std::cout << "No variables to optimize" << std::endl;
         return true;
     }
     double total_area_ = 0;
@@ -213,7 +213,7 @@ bool Elliptic_smoother_2D::go() {
     FOR(iter, options_.maxiter) {
         const double E_prev = evaluate_energy();
         const double detmin_prev = detmin_;
-        if (options_.debug > 0) std::cerr << "iteration #" << iter << ":    eps: " << eps_ << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
+        if (options_.debug > 0) std::cout << "iteration #" << iter << ":    eps: " << eps_ << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
 
 		bool better;
         if (options_.use_newton) better = run_newton(X);
@@ -221,7 +221,7 @@ bool Elliptic_smoother_2D::go() {
         var_.set_reducted_values(X);
 
         const double E = evaluate_energy();
-        if (options_.debug > 0) std::cerr << " E : " << E_prev << "  --->  " << E << std::endl;
+        if (options_.debug > 0) std::cout << " E : " << E_prev << "  --->  " << E << std::endl;
         if (options_.eps_from_theorem) {
             const double sigma = std::max(1. - E / E_prev, 1e-1);
             if (detmin_ >= 0) eps_ *= (1 - sigma);
@@ -230,7 +230,7 @@ bool Elliptic_smoother_2D::go() {
                 eps_ *= 1 - (sigma * det_eps_norm) / (std::abs(detmin_) + det_eps_norm);
 			}
         } else if (detmin_prev > 0. && detmin_ > 0.) {
-            std::cerr << "Stopping as detmin > 0 while not using the eps from theorem" << std::endl;
+            std::cout << "Stopping as detmin > 0 while not using the eps from theorem" << std::endl;
             break;
         } else if(!options_.barrier) {
             eps_ = std::min(.995*eps_, detmin_ > 0 ? .5*e0 : std::sqrt(e0*e0 + 0.04 * detmin_*detmin_));
@@ -242,7 +242,7 @@ bool Elliptic_smoother_2D::go() {
             nullStep = true;
         } else nullStep = false;
     }
-    if (options_.debug > 0) std::cerr << "E: " << evaluate_energy() << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
+    if (options_.debug > 0) std::cout << "E: " << evaluate_energy() << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
     return !ninverted_;
 }
 
@@ -304,7 +304,7 @@ inline mat3x3 dual_basis(const mat3x3& J) {
 }
 
 void Elliptic_smoother_3D::evaluate_jacobian() {
-    if (options_.debug > 3) std::cerr << "evaluate the jacobian...";
+    if (options_.debug > 3) std::cout << "evaluate the jacobian...";
     detmin_ = std::numeric_limits<double>::max();
     ninverted_ = 0;
     FOR(t, N_tets_) {
@@ -318,7 +318,7 @@ void Elliptic_smoother_3D::evaluate_jacobian() {
 
         K_[t] = dual_basis(J_[t]);
     }
-    if (options_.debug > 3) std::cerr << "ok" << std::endl;
+    if (options_.debug > 3) std::cout << "ok" << std::endl;
 
 }
 double Elliptic_smoother_3D::evaluate_energy() {
@@ -402,16 +402,16 @@ bool Elliptic_smoother_3D::run_newton(std::vector<double>& X) {
 
 bool Elliptic_smoother_3D::go() {
     if (options_.debug > 0) {
-        std::cerr << "==== Running Elliptic smoother 3d. ====" << "\n";
+        std::cout << "==== Running Elliptic smoother 3d. ====" << "\n";
         // display_options(options_);
     }
     if (var_.nb_of_reducted_variables() == 0) {
-        std::cerr << "No variables to optimize" << "\n";
+        std::cout << "No variables to optimize" << "\n";
         return true;
     }
     double total_vol_ = 0; // so that energy is always roughly the same
     FOR(i, N_tets_) total_vol_ += vol_[i];
-    if (options_.debug > 0) std::cerr << "total vol = " << total_vol_ << "\n";
+    if (options_.debug > 0) std::cout << "total vol = " << total_vol_ << "\n";
     FOR(i, N_tets_) vol_[i] = vol_[i] / total_vol_;
     evaluate_jacobian();
     double e0 = 1e-3;
@@ -428,12 +428,12 @@ bool Elliptic_smoother_3D::go() {
         eps_ = 1e-7;
     }
     FOR(iter, options_.maxiter) {
-        if (options_.debug > 0) std::cerr << "iteration #" << iter << "\n";
+        if (options_.debug > 0) std::cout << "iteration #" << iter << "\n";
         if (!options_.eps_from_theorem) {
             if (iter && iter % 10 == 0 && e0 > 1e-14) e0 /= 2.;
             eps_ = detmin_ > 0 ? e0 : std::sqrt(e0 * e0 + 0.04 * detmin_ * detmin_);
         }
-        if (options_.debug > 0) std::cerr << "E: " << evaluate_energy() << " eps: " << eps_ << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
+        if (options_.debug > 0) std::cout << "E: " << evaluate_energy() << " eps: " << eps_ << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
 
 
         std::vector<double> X(var_.nb_of_reducted_variables());
@@ -444,7 +444,7 @@ bool Elliptic_smoother_3D::go() {
         var_.set_reducted_values(X);
 
         double E = evaluate_energy();
-        if (options_.debug > 0) std::cerr << " E : " << E_prev << "  --->  " << E << "\n";
+        if (options_.debug > 0) std::cout << " E : " << E_prev << "  --->  " << E << "\n";
         if (options_.eps_from_theorem) {
             double sigma = std::max(1. - E / E_prev, 0.1);
             double mu = (1 - sigma) * chi(eps_, detmin_);
@@ -455,11 +455,11 @@ bool Elliptic_smoother_3D::go() {
         iter_call_back(iter);
         if (detmin_ > 0 && std::abs(E_prev - E) / E < options_.static_threshold) break;
         if (options_.stopping_when_static && std::abs(E_prev - E) / E < options_.static_threshold) {
-            std::cerr << "Stopping as Energy is static with threshold: " << options_.static_threshold << std::endl;
+            std::cout << "Stopping as Energy is static with threshold: " << options_.static_threshold << std::endl;
             break;
         }
 
     }
-    if (options_.debug > 0) std::cerr << "E: " << evaluate_energy() << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
+    if (options_.debug > 0) std::cout << "E: " << evaluate_energy() << " detmin: " << detmin_ << " ninv: " << ninverted_ << std::endl;
     return !ninverted_;
 }

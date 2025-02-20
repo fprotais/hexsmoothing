@@ -92,6 +92,7 @@ void convertedToTetMesh(
 
         
         FOR(c, hexes.size() / 8) {
+            // if (c>50000) break;
             FOR(i, 8) {
                 std::array<int, 4> tet;
                 std::array<utilities::vec3, 4> ref;

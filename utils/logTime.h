@@ -13,9 +13,9 @@ public:
         lastSubStep = begin;
     }
 
-    void logSubStep(std::string subTitle) {
+    void logSubStep(std::string const &subTitle, std::string const &subText = "") {
         auto now = std::chrono::steady_clock::now();
-        std::cout << "    [Time log] " << _title << " > " << subTitle << " = " << std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSubStep).count() / 1000. <<"s."<< std::endl;
+        std::cout << "    [Time log] " << _title << " > " << subTitle << " = " << std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSubStep).count() / 1000. <<"s. " << subText << std::endl;
         lastSubStep = now;
     }
 

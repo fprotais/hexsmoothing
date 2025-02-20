@@ -6,16 +6,16 @@
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " hexmesh.ext smoothed_hexmesh.ext nbiter" << std::endl;
-        std::cerr << "Input:" << std::endl;
-        std::cerr << "- hexmesh.ext must contain a hexahedral mesh" << std::endl;
-        std::cerr << "Output: " << std::endl;
-        std::cerr << "- smoothed_hexmesh.ext, result smoothed mesh'" << std::endl;
-        std::cerr << "Optional input: " << std::endl;
-        std::cerr << "- nbiter: number of smoothing iter. Default is 50." << std::endl;
-        std::cerr << std::endl;
-        std::cerr << "ext formats are ultimaille supported volumic formats (geogram, medit -.mesh- and vtk)." << std::endl;
-        std::cerr << "contact: francoisprotais@gmail.com" << std::endl;
+        std::cout << "Usage: " << argv[0] << " hexmesh.ext smoothed_hexmesh.ext nbiter" << std::endl;
+        std::cout << "Input:" << std::endl;
+        std::cout << "- hexmesh.ext must contain a hexahedral mesh" << std::endl;
+        std::cout << "Output: " << std::endl;
+        std::cout << "- smoothed_hexmesh.ext, result smoothed mesh'" << std::endl;
+        std::cout << "Optional input: " << std::endl;
+        std::cout << "- nbiter: number of smoothing iter. Default is 50." << std::endl;
+        std::cout << std::endl;
+        std::cout << "ext formats are ultimaille supported volumic formats (geogram, medit -.mesh- and vtk)." << std::endl;
+        std::cout << "contact: francoisprotais@gmail.com" << std::endl;
         return 1;
     }
     std::string inputMesh(argv[1]);

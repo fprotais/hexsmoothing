@@ -1,6 +1,7 @@
 #include "ultimaille/all.h"
 #include <lib/mesh_converter.h>
 #include "lib/elliptic_smoothing.h"
+#include <utils/logTime.h>
 
 #define FOR(i, n) for(int i = 0; i < n; i++)
 
@@ -8,13 +9,13 @@ using namespace UM;
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " mixedMesh.ext smoothed_hexmesh.ext nbiter" << std::endl;
-        std::cerr << "- (input) hexmesh.ext must contain a mesh. It can include Tetrahedra, Hexahedra, Wedges and Pyramids." << std::endl;
-        std::cerr << "- (output) smoothed_hexmesh.ext, result smoothed mesh'" << std::endl;
-        std::cerr << "- (input - optional) nbiter: number of smoothing iter. Default is 20." << std::endl;
-        std::cerr << std::endl;
-        std::cerr << "ext formats can be '.mesh' -medit- or '.vtk'." << std::endl;
-        std::cerr << "contact: francoisprotais@gmail.com" << std::endl;
+        std::cout << "Usage: " << argv[0] << " mixedMesh.ext smoothed_hexmesh.ext nbiter" << std::endl;
+        std::cout << "- (input) hexmesh.ext must contain a mesh. It can include Tetrahedra, Hexahedra, Wedges and Pyramids." << std::endl;
+        std::cout << "- (output) smoothed_hexmesh.ext, result smoothed mesh'" << std::endl;
+        std::cout << "- (input - optional) nbiter: number of smoothing iter. Default is 20." << std::endl;
+        std::cout << std::endl;
+        std::cout << "ext formats can be '.mesh' -medit- or '.vtk'." << std::endl;
+        std::cout << "contact: francoisprotais@gmail.com" << std::endl;
         return 1;
     }
     std::string inputMesh(argv[1]);
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
     std::vector<int> wedges; 
     std::vector<int> pyramids;
 
+    TimeLog logging("Mixed smoothing");
 
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
     std::cout << "MIXED MESH SMOOTHING" << std::endl;
@@ -72,7 +74,7 @@ int main(int argc, char** argv) {
 	options.static_threshold = 1e-7;
 	options.bfgs_threshold = 1e-14;
 	options.theta = 0.;
-	options.bfgs_maxiter = 50;
+	options.bfgs_maxiter = 100;
 	options.eps_from_theorem = true;
 	options.maxiter = nbIter;
 	options.debug = true;
@@ -91,6 +93,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Done: " << (res ? "success" : "failed untangling") << std::endl;
     UM::write_mixedMesh_byExtension(outputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    logging.logTotalTime();
 
     // UM::write_medit_format("output.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 

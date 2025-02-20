@@ -116,7 +116,7 @@ namespace STLBFGS {
         func_grad(x, f, g);
         for (int i=0; i<maxiter; i++) {
             if (norm(g)/std::max(1., norm(x))<=gtol) {
-                if (verbose) std::cerr << "||g||/max(1,||x||) <= " << gtol << std::endl;
+                if (verbose) std::cout << "||g||/max(1,||x||) <= " << gtol << std::endl;
                 return true;
             }
 
@@ -127,7 +127,7 @@ namespace STLBFGS {
             for (int i=0; i<n; i++)
                 gmax_ = std::max(gmax_, std::abs(g[i]));
             if (gmax_ <= gmax) {
-                if (verbose) std::cerr << "max{|g_i|, i = 1, ..., n} <= " <<  gmax << std::endl;
+                if (verbose) std::cout << "max{|g_i|, i = 1, ..., n} <= " <<  gmax << std::endl;
                 return true;
             }
 
@@ -154,7 +154,7 @@ namespace STLBFGS {
                     !line_search_more_thuente(ls_func, f0, alpha, mu, eta) &&
                     !line_search_backtracking(ls_func, f0, alpha, mu, eta)
                ) {
-                if (verbose) std::cerr << "Line search failed" << std::endl;
+                if (verbose) std::cout << "Line search failed" << std::endl;
                 return false;
             }
 
@@ -167,12 +167,12 @@ namespace STLBFGS {
             invH.add_correction(s, y);
 
             if ((fprev-f)/std::max(std::max(std::abs(fprev), std::abs(f)), 1.) <= ftol) {
-                if (verbose) std::cerr << "(f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= " << ftol << std::endl;
+                if (verbose) std::cout << "(f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= " << ftol << std::endl;
                 return true;
             }
 
             if (i==maxiter-1)
-                if (verbose) std::cerr << "reached maxiter" << std::endl;
+                if (verbose) std::cout << "reached maxiter" << std::endl;
         }
         return false;
     }

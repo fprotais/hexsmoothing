@@ -45,8 +45,8 @@ TEST_CASE("Permutation", "[permutation]") {
         for (int i=0; i<5; i++)
             CHECK( A[i]==B[i] );
 //      for (char c : A)
-//          std::cerr << c << " ";
-//      std::cerr << std::endl;
+//          std::cout << c << " ";
+//      std::cout << std::endl;
     }
 
     {
@@ -58,8 +58,8 @@ TEST_CASE("Permutation", "[permutation]") {
         for (int i=0; i<5; i++)
             CHECK( A[i]==B[i] );
 //      for (char c : B)
-//          std::cerr << c << " ";
-//      std::cerr << std::endl;
+//          std::cout << c << " ";
+//      std::cout << std::endl;
     }
 }
 

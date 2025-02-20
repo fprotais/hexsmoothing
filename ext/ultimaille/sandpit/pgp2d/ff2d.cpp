@@ -217,11 +217,11 @@ void compute_cross_field(Triangles &m, CornerAttribute<bool> &feature_edge, Corn
     fec.reset();
 
 
-    std::cerr << "Computing cross field...";
+    std::cout << "Computing cross field...";
     FacetAttribute<double> alpha(m), beta(m);
     compute_cross_field(m, fec, feature_edge, alpha, layer_shift, nb_FF_iters);
     for (int f : facet_iter(m)) beta[f] = alpha[f] + M_PI_2;
-    std::cerr << "ok\n";
+    std::cout << "ok\n";
 
     export_local_uv(m, fec, alpha, beta, uv);
 
@@ -281,7 +281,7 @@ void compute_cross_field(Triangles &m, CornerAttribute<bool> &feature_edge, Corn
 /*
 int main(int argc, char** argv) {
     if (2>argc) {
-        std::cerr << "Usage: " << argv[0] << " model.obj" << std::endl;
+        std::cout << "Usage: " << argv[0] << " model.obj" << std::endl;
         return 1;
     }
     nlInitialize(argc, argv);

@@ -31,29 +31,29 @@ namespace UM {
         std::ifstream in;
         in.open(filename, std::ifstream::in);
         if (in.fail()) {
-            std::cerr << "Failed to open " << filename << std::endl;
+            std::cout << "Failed to open " << filename << std::endl;
             exit(1);
         }
 
         std::string line;
         std::getline(in, line);
         if (!string_start(line, "# vtk DataFile Version")) {
-            std::cerr << "This vtk files seems incomplete, still trying... " << std::endl;
+            std::cout << "This vtk files seems incomplete, still trying... " << std::endl;
         }
         std::getline(in, line);
-//      std::cerr << "File loaded info :  " << line << std::endl;
+//      std::cout << "File loaded info :  " << line << std::endl;
         std::getline(in, line);
         if (line.find("ASCII") == std::string::npos) {
-            std::cerr << "This reader only reads standard ASCII VTK, failed reading " << filename << std::endl;
+            std::cout << "This reader only reads standard ASCII VTK, failed reading " << filename << std::endl;
             exit(1);
         }
         std::getline(in, line);
         if (line.find("UNSTRUCTURED_GRID") == std::string::npos) {
-            std::cerr << "This reader only reads UNSTRUCTURED_GRID standard ASCII VTK, failed reading " << filename << std::endl;
+            std::cout << "This reader only reads UNSTRUCTURED_GRID standard ASCII VTK, failed reading " << filename << std::endl;
         }
         in >> line;
         if (!string_start(line, "POINTS")) {
-            std::cerr << "This reader only reads UNSTRUCTURED_GRID standard ASCII VTK, failed reading " << filename << std::endl;
+            std::cout << "This reader only reads UNSTRUCTURED_GRID standard ASCII VTK, failed reading " << filename << std::endl;
             exit(1);
         }
         int nb_vertices = 0; in >> nb_vertices;
@@ -67,7 +67,7 @@ namespace UM {
         file_must_no_be_at_end(in, "parsing VTK");
         in >> line;
         if (!string_start(line, "CELLS")) {
-            std::cerr << "Error in vtk while reading : " << filename << std::endl;
+            std::cout << "Error in vtk while reading : " << filename << std::endl;
             exit(1);
         }
         file_must_no_be_at_end(in, "parsing VTK");
@@ -92,13 +92,13 @@ namespace UM {
         file_must_no_be_at_end(in, "parsing VTK");
         in >> line;
         if (!string_start(line, "CELL_TYPES")) {
-            std::cerr << "Error in vtk while reading : " << filename << std::endl;
+            std::cout << "Error in vtk while reading : " << filename << std::endl;
             exit(1);
         }
         file_must_no_be_at_end(in, "parsing VTK");
         int new_nb_cells = 0; in >> new_nb_cells;
         if (new_nb_cells != nb_cells) {
-            std::cerr << "Incoherent nb of cell : " << filename << std::endl;
+            std::cout << "Incoherent nb of cell : " << filename << std::endl;
             exit(1);
         }
         constexpr int pixel2quad[4] = { 0,1,3,2 };
@@ -150,7 +150,7 @@ namespace UM {
         std::ofstream out_f;
         out_f.open(filename, std::ifstream::out);
         if (out_f.fail()) {
-            std::cerr << "Failed to open " << filename << std::endl;
+            std::cout << "Failed to open " << filename << std::endl;
             return;
         }
         std::stringstream out;
@@ -262,7 +262,7 @@ namespace UM {
                 FOR(i, 4) quads.push_back(m.vert(f, i));
             }
             else {
-                std::cerr << "Polygon are not supported in our vtk writer" << std::endl;
+                std::cout << "Polygon are not supported in our vtk writer" << std::endl;
             }
         }
         write_vtk_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
@@ -285,7 +285,7 @@ namespace UM {
             pyramids.resize(5 * m.ncells());
             FOR(h, m.ncells()) FOR(hv, 5) pyramids[5 * h + hv] = m.vert(h, hv);
         } else {
-            std::cerr << "Volume type : " << m.cell_type() << "; not supported in our vtk writer" << std::endl;
+            std::cout << "Volume type : " << m.cell_type() << "; not supported in our vtk writer" << std::endl;
         }
 
         write_vtk_format(filename, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
