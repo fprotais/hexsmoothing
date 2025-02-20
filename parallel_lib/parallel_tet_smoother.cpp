@@ -2,7 +2,6 @@
 #include <numeric>
 
 #include "ultimaille/syntactic-sugar/assert.h"
-#include "ultimaille/helpers/hilbert_sort.h"
 #include "lbfgs_wrapper.h"
 
 #include <utils/logTime.h>
@@ -112,7 +111,6 @@ void Parallel_tet_smoother::createCompressSortedData() {
     _tetGrad.resize(_tetData.size());
 
     if (verbose) std::cout << "    Compressing vertices... " << std::endl;
-
     _originalToCompressed.resize(nbPoints);
     unsigned nbCompressed = 0;
     std::vector<unsigned> compressedToOriginal;
@@ -134,34 +132,6 @@ void Parallel_tet_smoother::createCompressSortedData() {
             _compressedCoord[3*_originalToCompressed[v]+d] = _mesh._pts[v][d];
             _compressedLocks[3*_originalToCompressed[v]+d] = _vertDimLock[3*v+d];
         }
-    }
-
-    if (verbose) std::cout << "    Hilbert sorting vertices... " << std::endl;
-    std::vector<UM::vec3> umPoints(nbCompressed);
-    for (unsigned v = 0; v < nbCompressed; ++v) {
-        for (unsigned d = 0; d < 3; ++d) {
-            umPoints[v][d] = _compressedCoord(3*v+d);
-        }
-    }
-    std::vector<int> hilbertPermutation(umPoints.size());
-    std::iota(hilbertPermutation.begin(), hilbertPermutation.end(), 0.);
-    // UM::HilbertSort hs(umPoints);
-    // hs.apply(hilbertPermutation);
-
-    Eigen::VectorXd tmpCompressedCoord(_compressedCoord.size());
-    std::vector<bool> tmpCompressedLocks(_compressedCoord.size());
-    for (unsigned v = 0; v < nbCompressed; ++v) {
-        for (unsigned d = 0; d < 3; ++d) {
-            tmpCompressedCoord(3*v+d) = _compressedCoord(3*hilbertPermutation[v]+d);
-            tmpCompressedLocks[3*v+d] = _compressedLocks[3*hilbertPermutation[v]+d];
-        }
-    }
-    _compressedCoord = tmpCompressedCoord;
-    _compressedLocks = tmpCompressedLocks;
-    for (unsigned v = 0; v < nbPoints; ++v) {
-        if (_originalToCompressed[v] == -1) continue;
-        _originalToCompressed[v] = hilbertPermutation[_originalToCompressed[v]];
-        compressedToOriginal[_originalToCompressed[v]] = v;
     }
 
     for (TetStorage &tet : _tetData) {
@@ -224,7 +194,7 @@ bool Parallel_tet_smoother::go() {
         };
         opt.setMaxIter(max_lbfgs_iter);
         bool optRes = opt.optimize(_compressedCoord);
-        if (!fineTimeLogging && verbose) std::cout << " Done." << std::endl;
+        if (!fineTimeLogging && verbose) std::cout << " done." << std::endl;
         if (fineTimeLogging) fineLogging.logTotalTime();
         double e = elliptic_energy(_compressedCoord);
         if (verbose) std::cout << "    E: " << e_prev << " -> " << e  << " | " << " detmin: " << _detMin << " ninv: " << _nbInverted << "\n";

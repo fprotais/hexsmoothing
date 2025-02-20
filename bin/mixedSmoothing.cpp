@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 	options.static_threshold = 1e-7;
 	options.bfgs_threshold = 1e-14;
 	options.theta = 0.;
-	options.bfgs_maxiter = 100;
+	options.bfgs_maxiter = 500;
 	options.eps_from_theorem = true;
 	options.maxiter = nbIter;
 	options.debug = true;

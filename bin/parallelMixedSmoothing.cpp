@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     TimeLog logging("Parallel smoothing");
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
-    // UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    // UM::write_medit_format("inputPar.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
     
     logging.logSubStep("Reading mesh");
 	utilities::TetrahedralMesh proxy_mesh;
@@ -76,7 +76,8 @@ int main(int argc, char** argv) {
     smoother.setRefs(refs);
     smoother.setVertsLocks(bndVert);
     smoother.max_untangling_iter = nbIter;
-    smoother.fineTimeLogging = (proxy_mesh._tets.size() > 100000); // enable to see the progress on large meshes
+    smoother.max_lbfgs_iter = 500;
+    smoother.fineTimeLogging = (proxy_mesh._tets.size() > 3000000); // enable to see the progress on large meshes
     bool res = smoother.go();
 
     FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[i][d];
@@ -88,7 +89,7 @@ int main(int argc, char** argv) {
     logging.logSubStep("Saving mesh");
     logging.logTotalTime();
 
-    // UM::write_medit_format("output.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    // UM::write_medit_format("outputPar.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
    
     return 0;

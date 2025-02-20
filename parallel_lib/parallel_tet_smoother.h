@@ -42,7 +42,6 @@ private:
     std::vector<bool> _vertDimLock;
 
     void createCompressSortedData();
-    void hilbertSort();
     Eigen::VectorXd _compressedCoord;
     std::vector<bool> _compressedLocks;
     std::vector<std::vector<unsigned>> _vert2tetCorner;
