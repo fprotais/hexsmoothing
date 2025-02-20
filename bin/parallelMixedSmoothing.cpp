@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 
     std::uniform_real_distribution<float> distrib(-1., 1.);
     std::mt19937 gen(42);
-    FOR(v, verts.size()) if (!bndVert[v]) proxy_mesh._pts[v] +=  pert * avgEdgeSize * utilities::vec3{distrib(gen), distrib(gen), distrib(gen)};
+    // FOR(v, verts.size()) if (!bndVert[v]) proxy_mesh._pts[v] +=  pert * avgEdgeSize * utilities::vec3{distrib(gen), distrib(gen), distrib(gen)};
 
     FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[vert_old2new[i]][d];
 
