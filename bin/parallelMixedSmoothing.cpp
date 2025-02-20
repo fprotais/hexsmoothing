@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
     TimeLog logging("Parallel smoothing");
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
-    UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    // UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
     
 
@@ -122,13 +122,13 @@ int main(int argc, char** argv) {
 
     double pert = 100.;
 
-    std::uniform_real_distribution<float> distrib(-1., 1.);
-    std::mt19937 gen(42);
+    // std::uniform_real_distribution<float> distrib(-1., 1.);
+    // std::mt19937 gen(42);
     // FOR(v, verts.size()) if (!bndVert[v]) proxy_mesh._pts[v] +=  pert * avgEdgeSize * utilities::vec3{distrib(gen), distrib(gen), distrib(gen)};
 
     FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[vert_old2new[i]][d];
 
-    UM::write_medit_format("input_pert.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    // UM::write_medit_format("input_pert.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
     logging.logSubStep("Convert to tet elements");
 
@@ -178,7 +178,8 @@ int main(int argc, char** argv) {
 
         FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[vert_old2new[i]][d];
         
-        UM::write_mixedMesh_byExtension("untangled.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+        std::cout << "Pre-saving mesh: " << outputMesh << std::endl;
+        UM::write_mixedMesh_byExtension(outputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
         std::cout << "===================================================================================" << std::endl;
         std::cout << "Untangling done: " << ((mindet > 0) ? "Success" : "Fail") << std::endl;
         std::cout << "===================================================================================" << std::endl;

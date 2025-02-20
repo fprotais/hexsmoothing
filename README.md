@@ -1,26 +1,40 @@
 # hexsmoothing
-Hexahedral smoothing codes done during my Ph.D.
+Hexahedral and mixed elements smoothing.
 
-I loosely maintain the code, but won't develop new features in the short term; don't hesitate to reach out if you have any questions. 
+# Prerequisite
 
-# building and running
+If you want to run the parallel version of the code, you'll need Eigen (>3.1) and OpenMP (> 4.0).
+```sh
+brew install eigen
+```
+```sh
+sudo apt install libeigen3-dev
+```
+```sh
+sudo dnf install eigen3-devel
+```
+# building
+
 You can build the library and its corresponding executable doing: 
 ```
 git clone https://github.com/fprotais/hexsmoothing
 cd hexsmoothing
 mkdir build
 cd build
-cmake ..
+cmake -DPARALLEL_MIXED_SMOOTHING=ON .. 
 make -j
 ```
 There might be some linking issues, redoing `cmake .. && make -j` usually solve those. The lib was made to be easy to link against. It is poorly documented though. Don't hesitate to raise an issue if you have any questions. 
 
+# Mixed elements smoothing
+
 You can run a mixed elements smoother/untangler (Tets, Pyramids, Wedges and Hexes) using the following executable, from the build directory: 
 ```
-./mixedSmoothing ../mixedElementsMesh.vtk result.vtk 
+./parallelMixedSmoothing ../mixedElementsMesh.vtk result.vtk 
 ```
-An optional parameter is the number of iteration of smoothing. Input and output files must be .vtk, for me to be able to read mixed meshes. Boundary of the model will be fixed. For more precise control, I recommend looking into the C++ code and directly using the library.  
+An optional parameter is the number of iteration of smoothing. Input and output files can be .vtk or .mesh, for me to be able to read mixed meshes. Boundary of the model will be fixed. For more precise control, I recommend looking into the C++ code and directly using the library.  
 
+The code will first do an untangling loop, then try to optimize the quality further. I am still tweaking the parameters so they may not be perfect, particularly on large meshes. 
 # Cite the repo
 You can directly cite this repository: 
 ```
