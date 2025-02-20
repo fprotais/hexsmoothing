@@ -1,6 +1,7 @@
 #include <ultimaille/all.h>
 #include <lib/mesh_converter.h>
 #include <lib/elliptic_smoothing.h>
+#include <lib/hilbertMeshSort.h>
 
 #include <parallel_lib/parallel_tet_smoother.h>
 
@@ -52,7 +53,7 @@ int main(int argc, char** argv) {
     TimeLog logging("Parallel smoothing");
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
-    // UM::write_medit_format("inputPar.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    UM::write_medit_format("inputPar.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
     
     logging.logSubStep("Reading mesh");
 	utilities::TetrahedralMesh proxy_mesh;
@@ -60,6 +61,35 @@ int main(int argc, char** argv) {
     std::vector<bool> bndVert;
 
     convertedToTetMesh(verts, tets, hexes, wedges, pyramids, proxy_mesh, bndVert, refs);
+
+
+
+    // for re-ordering
+    std::vector<int> vert_old2new(proxy_mesh._pts.size());
+    std::vector<int> tet_old2new(proxy_mesh._tets.size());
+    std::iota(vert_old2new.begin(), vert_old2new.end(), 0.);
+    std::iota(tet_old2new.begin(), tet_old2new.end(), 0.);
+
+    constexpr bool doHilbertSort = false; // Should improve cache access. Did not see impact for meshes with 200k hexes. Maybe will have with larger? 
+
+    if (doHilbertSort) { 
+        hilbertSort(proxy_mesh, vert_old2new, tet_old2new);
+        {
+            std::vector<std::array<utilities::vec3, 4>> tmprefs = refs;
+            for (unsigned t = 0; t < tet_old2new.size(); ++t) {
+                tmprefs[tet_old2new[t]] = refs[t];
+            }
+            refs = tmprefs;
+            std::vector<bool> tmpbndVert = bndVert;
+            for (unsigned v = 0; v < vert_old2new.size(); ++v) {
+                tmpbndVert[vert_old2new[v]] = bndVert[v];
+            }
+            bndVert = tmpbndVert;
+        }
+        logging.logSubStep("Hilbert sort");
+    }
+
+
 
     double avgEdgeSize = 0;
     FOR(i, proxy_mesh._tets.size()) FOR(j, 3) {
@@ -76,11 +106,11 @@ int main(int argc, char** argv) {
     smoother.setRefs(refs);
     smoother.setVertsLocks(bndVert);
     smoother.max_untangling_iter = nbIter;
-    smoother.max_lbfgs_iter = 500;
+    smoother.max_lbfgs_iter = 50;
     smoother.fineTimeLogging = (proxy_mesh._tets.size() > 3000000); // enable to see the progress on large meshes
     bool res = smoother.go();
 
-    FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[i][d];
+    FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[vert_old2new[i]][d];
     logging.logSubStep("Smoothing");
     
 
