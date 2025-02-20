@@ -176,6 +176,7 @@ bool Parallel_tet_smoother::go() {
     if (verbose) std::cout << "Initial energy: " << elliptic_energy(_compressedCoord) << " | eps: " << _eps << " detmin: " << _detMin << " ninv: " << _nbInverted << std::endl;
 
     updateEps(0.5);
+    _eps0 = _eps;
 
     for (unsigned iter = 0; iter < max_untangling_iter; ++iter) {
         if (verbose) std::cout << "Smoothing iteration #" << iter << "\n";
@@ -217,10 +218,15 @@ bool Parallel_tet_smoother::go() {
 
 void Parallel_tet_smoother::updateEps(double rate) {
     // mix of foldover and 2002 epsilons.
+    if (_detMin > 0) {
+        _eps = 1e-16;
+        return;
+    }
     double sigma = std::max(1. - rate, 0.1);
     double mu = (1 - sigma) * chi(_eps, _detMin);
     _eps = _detMin < mu ? 2 * std::sqrt(mu * (mu - _detMin)) : _noUntanglingEps;
     _eps = std::min(_eps, std::sqrt(_eps0 * _eps0 + 0.04 * _detMin * _detMin));
+    _eps0 *= 0.85;
 }
 
 

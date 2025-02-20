@@ -9,11 +9,30 @@
 #include <omp.h>
 
 #include <utils/logTime.h>
+#include <random>
 
 
 #define FOR(i, n) for(int i = 0; i < n; i++)
 
 using namespace UM;
+
+
+double getAvgEdgeSize(utilities::TetrahedralMesh const &mesh) {
+    double avgEdgeSize = 0;
+    FOR(i, mesh._tets.size()) FOR(j, 3) {
+            utilities::vec3 e = mesh._pts[mesh._tets[i][j+1]] - mesh._pts[mesh._tets[i][0]];
+            avgEdgeSize += e.norm();
+    }
+    return avgEdgeSize / (3*mesh._tets.size());
+}
+
+double det(utilities::TetrahedralMesh const &mesh, int t) {
+    std::array<utilities::vec3,3> b;
+    FOR(j, 3) {
+        b[j] = mesh._pts[mesh._tets[t][j+1]] - mesh._pts[mesh._tets[t][0]];
+    }
+    return cross(b[0], b[1]) * b[2];
+}
 
 int main(int argc, char** argv) {
     if (argc < 3) {
@@ -53,8 +72,10 @@ int main(int argc, char** argv) {
     TimeLog logging("Parallel smoothing");
     UM::read_mixedMesh_byExtension(inputMesh, verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
-    UM::write_medit_format("inputPar.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+    UM::write_medit_format("input.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+
     
+
     logging.logSubStep("Reading mesh");
 	utilities::TetrahedralMesh proxy_mesh;
 	std::vector<std::array<utilities::vec3, 4>> refs;
@@ -91,16 +112,78 @@ int main(int argc, char** argv) {
 
 
 
-    double avgEdgeSize = 0;
-    FOR(i, proxy_mesh._tets.size()) FOR(j, 3) {
-            utilities::vec3 dir = proxy_mesh._pts[proxy_mesh._tets[i][j+1]] - proxy_mesh._pts[proxy_mesh._tets[i][0]];
-            avgEdgeSize += dir.norm();
+    double avgEdgeSize = getAvgEdgeSize(proxy_mesh);
+
+    FOR(i, proxy_mesh._pts.size()) {
+        // proxy_mesh._pts[i] /= avgEdgeSize;
     }
-    avgEdgeSize /= 3*proxy_mesh._tets.size();
-    FOR(i, proxy_mesh._tets.size()) FOR(j, 4) {
-        refs[i][j] *= avgEdgeSize;
-    }
+    // avgEdgeSize = getAvgEdgeSize(proxy_mesh);
+
+
+    double pert = 100.;
+
+    std::uniform_real_distribution<float> distrib(-1., 1.);
+    std::mt19937 gen(42);
+    FOR(v, verts.size()) if (!bndVert[v]) proxy_mesh._pts[v] +=  pert * avgEdgeSize * utilities::vec3{distrib(gen), distrib(gen), distrib(gen)};
+
+    FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[vert_old2new[i]][d];
+
+    UM::write_medit_format("input_pert.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+
     logging.logSubStep("Convert to tet elements");
+
+    double mindet = std::numeric_limits<double>::max();
+    FOR(t, proxy_mesh._tets.size()) mindet = std::min(det(proxy_mesh, t), mindet);
+
+    bool untangleFirst = (mindet < 0);
+    std::cout << "Min det is: " << mindet << std::endl;
+
+    if (untangleFirst) {
+        std::cout << "===================================================================================" << std::endl;
+        std::cout << "Starting by untangling mesh" << std::endl;
+        std::cout << "===================================================================================" << std::endl;
+        std::vector<bool> locks = bndVert;
+        constexpr unsigned maxUntangleIter = 10;
+        unsigned untangleIter = 1;
+        unsigned nbVar = locks.size();
+        while (mindet < 0) {
+            std::cout << "Untangling iter: " << untangleIter << std::endl;
+            Parallel_tet_smoother untangler(proxy_mesh);
+            untangler.setRefs(refs);
+            untangler.setVertsLocks(locks);
+            untangler.max_untangling_iter =  untangleIter * untangleIter + 2;
+            untangler.max_lbfgs_iter = 5000;
+            untangler.verbose = nbVar > 5000;
+            untangler.fineTimeLogging = (nbVar > 500000); // enable to see the progress on large meshes
+            bool res = untangler.go();
+
+            std::fill(locks.begin(), locks.end(), true); // on second iter untangling only flipped elements
+            nbVar = 0;
+            mindet = std::numeric_limits<double>::max();
+            FOR(t, proxy_mesh._tets.size()) {
+                double tetdet = det(proxy_mesh, t);
+                mindet = std::min(tetdet, mindet);
+                if (tetdet > 0) continue;
+                FOR(tv, 4) if (!bndVert[proxy_mesh._tets[t][tv]] && locks[proxy_mesh._tets[t][tv]]) {
+                    ++nbVar;
+                    locks[proxy_mesh._tets[t][tv]] = false;
+                }
+            }
+            std::cout << "mindet: " << mindet << std::endl;
+
+            if (mindet > 0) break;
+
+            if (maxUntangleIter == untangleIter++) break;
+        }
+
+        FOR(i, verts.size()) FOR(d, 3) verts[i][d] = proxy_mesh._pts[vert_old2new[i]][d];
+        
+        UM::write_mixedMesh_byExtension("untangled.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
+        std::cout << "===================================================================================" << std::endl;
+        std::cout << "Untangling done: " << ((mindet > 0) ? "Success" : "Fail") << std::endl;
+        std::cout << "===================================================================================" << std::endl;
+        logging.logSubStep("Untangling");
+    }
 
     Parallel_tet_smoother smoother(proxy_mesh);
     smoother.setRefs(refs);
@@ -119,7 +202,6 @@ int main(int argc, char** argv) {
     logging.logSubStep("Saving mesh");
     logging.logTotalTime();
 
-    // UM::write_medit_format("outputPar.mesh", verts, edges, tris, quads, tets, hexes, wedges, pyramids);
 
    
     return 0;
