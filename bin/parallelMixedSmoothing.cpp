@@ -83,7 +83,10 @@ int main(int argc, char** argv) {
 
     convertedToTetMesh(verts, tets, hexes, wedges, pyramids, proxy_mesh, bndVert, refs);
 
-
+    std::fill(bndVert.begin(), bndVert.end(), false);
+    for (auto v : edges) {bndVert[v] = true; }
+    for (auto v : tris) {bndVert[v] = true; }
+    for (auto v : quads) {bndVert[v] = true; }
 
     // for re-ordering
     std::vector<int> vert_old2new(proxy_mesh._pts.size());
