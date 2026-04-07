@@ -1,6 +1,8 @@
 # hexsmoothing
 Hexahedral and mixed elements smoothing.
 
+> ⚠️ This code will no longer be updated. A better version will be maintened at [Mesh_optimization](https://github.com/fprotais/Mesh_optimization)
+
 # Prerequisite
 
 If you want to run the parallel version of the code, you'll need Eigen (>3.1) and OpenMP (> 4.0).
